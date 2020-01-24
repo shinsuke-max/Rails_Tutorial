@@ -19,21 +19,37 @@ describe "Static pages" do
       it "タイトルが正しく表示されているか" do
         expect(page).to have_title full_title('')
       end
-      
+
     end
   end
 
   describe "Help page" do
     it "should have the content 'Help'" do
-      visit '/static_pages/help'
+      visit help_path
       expect(page).to have_content('Help')
     end
 
     it "should have the title About" do
-      visit '/static_pages/about'
+      visit about_path
       expect(page).to have_title("Ruby on Rails Tutorial Sample App")
     end
+  end
 
+#Contact Test
+  describe "Contact" do
+    before do
+      visit contact_path
+    end
+
+    describe "Contact page" do
+      it "should have the content 'Contact'" do
+        expect(page).to have_content('これはContact')
+      end
+
+      it "should have the title Contact" do
+        expect(page).to have_title("Ruby on Rails Tutorial Sample App")
+      end
+    end
   end
 
 end
