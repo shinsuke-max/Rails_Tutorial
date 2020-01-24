@@ -3,23 +3,24 @@ require 'rails_helper'
 describe "Static pages" do
 
   describe 'Home' do
-    it 'タイトル内容の表示' do
+    before do
       visit '/'
-      expect(page).to have_title 'Home | Ruby on Rails Tutorial Sample App'
-    end
-  end
-
-  describe "Home page" do
-    it "should have the content 'Sample App'" do
-      visit '/static_pages/home'
-      expect(page).to have_content('Sample App')
     end
 
-    it "should have the title Home" do
-      visit '/static_pages/home'
-      expect(page).to have_title("Ruby on Rails Tutorial Sample App")
-    end
+    describe "Home page" do
+      it "should have the content 'Sample App'" do
+        expect(page).to have_content('Sample App')
+      end
 
+      it "should have the title Home" do
+        expect(page).to have_title("Ruby on Rails Tutorial Sample App")
+      end
+
+      it "タイトルが正しく表示されているか" do
+        expect(page).to have_title full_title('')
+      end
+      
+    end
   end
 
   describe "Help page" do
