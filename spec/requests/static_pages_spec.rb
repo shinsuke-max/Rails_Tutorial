@@ -8,7 +8,7 @@ RSpec.describe 'Access to static_pages', type: :request do
       expect(response).to have_http_status 200
     end
     it "has title 'Ruby on Rails Tutorial Sample App'" do
-      expect(response.body).to include 'Ruby on Rails Tutorial Sample App'
+      expect(response.body).to include full_title('')
       expect(response.body).to_not include '| Ruby on Rails Tutorial Sample App'
     end
   end
@@ -19,7 +19,7 @@ RSpec.describe 'Access to static_pages', type: :request do
       expect(response).to have_http_status 200
     end
     it "has title 'Help | Ruby on Rails Tutorial Sample App'" do
-      expect(response.body).to include 'Help | Ruby on Rails Tutorial Sample App'
+      expect(response.body).to include full_title('Help')
     end
   end
 
@@ -29,7 +29,17 @@ RSpec.describe 'Access to static_pages', type: :request do
       expect(response).to have_http_status 200
     end
     it "has title 'About | Ruby on Rails Tutorial Sample App'" do
-      expect(response.body).to include 'About | Ruby on Rails Tutorial Sample App'
+      expect(response.body).to include full_title('About')
+    end
+  end
+
+  context 'GET #contact' do
+    before { get contact_path }
+    it 'responds successfully' do
+      expect(response).to have_http_status 200
+    end
+    it "タイトルが 'Contact | Ruby on Rails Tutorial Sample App' となっている" do
+      expect(response.body).to include full_title('Contact')
     end
   end
 
