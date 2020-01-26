@@ -26,7 +26,33 @@ RSpec.describe User, type: :model do
                                       'foo@bar+baz.com').for(:email)
     end
 
-    
-  end
+    describe 'validate unqueness of email' do
+      let!(:user) { create(:user, email: 'original@example.com') }
+      it 'is invalid with a duplicate email' do
+        user = build(:user, email: 'original@example.com')
+        expect(user).to_not be_valid
+      end
+      it 'is case insensitive in email' do
+        user = build(:user, email: 'ORIGINAL@EXAMPLE.COM')
+        expect(user).to_not be_valid
+      end
+    end
 
+    describe 'before_save' do
+      describe '#email_downcase' do
+        let!(:user) { create(:user, email: 'ORIGINAL@EXAMPLE.COM') }
+        it 'makes email to low case' do
+          expect(user.reload.email).to eq 'original@example.com'
+        end
+      end
+    end
+
+    describe 'validate presence of password' do
+      it 'is invalid with a blank password' do
+        user = build(:user, password: ' ' * 6)
+        expect(user).to_not be_valid
+      end
+    end
+    it { is_expected.to validate_length_of(:password).is_at_least(6) }
+  end
 end
