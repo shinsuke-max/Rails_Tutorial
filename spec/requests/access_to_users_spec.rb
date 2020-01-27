@@ -19,8 +19,11 @@ RSpec.describe 'access to users', type: :request do
       context 'adds a user' do
         before { post signup_path, params: { user: attributes_for(:user) } }
         subject { response }
-        it { is_expected.to redirect_to user_path(User.last) } #showページにリダイレクトされる
-        it { is_expected.to have_http_status 302 } #リダイレクト成功
+        it { is_expected.to redirect_to user_path(User.last) }
+        it { is_expected.to have_http_status 302 }
+        it 'ユーザー作成後にログインしているか' do
+          expect(is_logged_in?).to be_truthy
+        end
       end
     end
 
