@@ -55,4 +55,12 @@ RSpec.describe User, type: :model do
     end
     it { is_expected.to validate_length_of(:password).is_at_least(6) }
   end
+
+  describe "authenticated? should return false for a user with nil digest" do
+    let(:user) { FactoryBot.create(:user) }
+    it "ダイジェストが存在しない場合のauthenticated?のテスト" do
+      expect(user.authenticated?("")).to eq false
+    end
+  end
+
 end
