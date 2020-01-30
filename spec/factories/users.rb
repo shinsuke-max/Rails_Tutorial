@@ -5,6 +5,8 @@ FactoryBot.define do
     password { "password" }
     password_confirmation { "password" }
     admin { true }
+    activated { true }
+    activated_at { Time.zone.now }
   end
 
   factory :other_user, class: User do
@@ -12,7 +14,8 @@ FactoryBot.define do
     email { "other@example.com" }
     password { "foobar" }
     password_confirmation { "foobar" }
-    admin { false }
+    activated { true }
+    activated_at { Time.zone.now }
   end
 
   factory :other_user2, class: User do
@@ -20,7 +23,8 @@ FactoryBot.define do
     email { "other2@example.com" }
     password { "foobar" }
     password_confirmation { "foobar" }
-    admin { false }
+    activated { true }
+    activated_at { Time.zone.now }
   end
 
 end
