@@ -2,7 +2,13 @@ require 'rails_helper'
 
 RSpec.describe 'users', type: :system do
   let(:user) { FactoryBot.create(:user) }
-  let(:other_user) { FactoryBot.create(:user) }
+  let(:other_user) { FactoryBot.create(:other_user) }
+  let(:other_user2) { FactoryBot.create(:other_user2) }
+
+  before(:each) do
+    @user = create(:user)
+    @other_user = create(:other_user)
+  end
 
   describe 'user create a new account' do
     context 'enter an valid values' do
@@ -86,14 +92,24 @@ RSpec.describe 'users', type: :system do
         valid_login(user)
         click_link "Users"
         expect(page).to have_current_path '/users'
-        #expect(page).to have_link('delete', href: user_path(User.second))
+        expect(page).to have_link('delete', href: user_path(User.first))
         expect(page).not_to have_link('delete', href: user_path(user))
-        #expect {
-          #click_link('delete', match: :first)
-          #expect(page.driver.browser.switch_to.alert.text).to eq "You sure?"
-          #page.driver.browser.switch_to.alert.accept
-          #expect(page).to have_css("div.alert.alert-success", text: "User deleted")
-        #}.to change(User, :count).by(-1)
+        expect {
+          click_link('delete', match: :first)
+          expect(page.driver.browser.switch_to.alert.text).to eq "You sure?"
+          page.driver.browser.switch_to.alert.accept
+          expect(page).to have_css("div.alert.alert-success", text: "User deleted")
+        }.to change(User, :count).by(-1)
+      end
+    end
+
+    context "Adminユーザー出ない場合" do
+      scenario "ユーザーの削除に失敗" do
+        valid_login(other_user2)
+        click_link "Users"
+        expect(page).to have_current_path '/users'
+        expect(page).not_to have_link('delete', href: user_path(User.first))
+        expect(page).not_to have_link('delete', href: user_path(User.second))
       end
     end
   end

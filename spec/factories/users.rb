@@ -15,4 +15,12 @@ FactoryBot.define do
     admin { false }
   end
 
+  factory :other_user2, class: User do
+    name { "Other2 User"}
+    email { "other2@example.com" }
+    password { "foobar" }
+    password_confirmation { "foobar" }
+    admin { false }
+  end
+
 end
