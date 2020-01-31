@@ -1,9 +1,15 @@
 require 'rails_helper'
 
 RSpec.describe User, type: :model do
+  let(:user) { FactoryBot.create(:user) }
   
   it 'has a valid factory bot' do
     expect(build(:user)).to be_valid
+  end
+
+  it "ユーザーが削除されたら投稿も削除されること" do
+    user.microposts.create!(content: "Test")
+    expect{ user.destroy }.to change{ Micropost.count }.by(-1)
   end
 
   describe 'validations' do
