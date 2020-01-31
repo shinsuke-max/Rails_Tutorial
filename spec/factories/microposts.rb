@@ -2,6 +2,7 @@ FactoryBot.define do
   factory :micropost do
     content { "MyText" }
     user_id { user.id }
+    user
   end
 
   factory :microposts, class: Micropost do

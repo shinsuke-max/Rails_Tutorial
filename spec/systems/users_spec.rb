@@ -4,10 +4,22 @@ RSpec.describe 'users', type: :system do
   let(:user) { FactoryBot.create(:user) }
   let(:other_user) { FactoryBot.create(:other_user) }
   let(:other_user2) { FactoryBot.create(:other_user2) }
+  let(:user_with_microposts) { FactoryBot.create(:user_with_microposts) }
 
   before(:each) do
-    @user = create(:user)
     @other_user = create(:other_user)
+    @admin_user = create(:admin_user)
+  end
+
+  describe "user show" do
+    before do
+      valid_login(user_with_microposts)
+      visit user_path(user_with_microposts)
+    end
+
+    it "Micropostが表示されていること" do
+      expect(page).to have_content("#{user_with_microposts.name}")
+    end
   end
 
   describe 'user create a new account' do
@@ -53,7 +65,8 @@ RSpec.describe 'users', type: :system do
     before do
       visit user_path(user)
       valid_login(user)
-      click_link "Setting"
+      click_link "Account"
+      click_link "Settings"
     end
 
     scenario "ユーザーの編集に成功" do
@@ -89,7 +102,7 @@ RSpec.describe 'users', type: :system do
   describe "ユーザー削除" do
     context "Adminユーザーの場合" do
       scenario "ユーザーの削除に成功" do
-        valid_login(user)
+        valid_login(@admin_user)
         click_link "Users"
         expect(page).to have_current_path '/users'
         expect(page).to have_link('delete', href: user_path(User.first))

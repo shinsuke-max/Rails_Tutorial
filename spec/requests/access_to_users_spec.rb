@@ -1,13 +1,19 @@
 require 'rails_helper'
 
 RSpec.describe 'access to users', type: :request do
-  let(:user) { FactoryBot.create(:user) }
-  let(:other_user) { FactoryBot.create(:user) }
+  #let(:user) { FactoryBot.create(:user) }
+  #let(:other_user) { FactoryBot.create(:other_user) }
+  #let(:admin_user) { FactoryBot.create(:admin_user) }
+  before(:each) do
+    @user = create(:user)
+    @other_user = create(:other_user)
+    @admin_user = create(:admin_user)
+  end
 
   describe "GET #index" do
     context "ログイン済みのユーザーとして" do
       it "正しく表示されているか" do
-        sign_in_as user
+        sign_in_as @user
         get users_path
         expect(response).to be_success
         expect(response).to have_http_status 200
@@ -25,8 +31,8 @@ RSpec.describe 'access to users', type: :request do
   describe 'GET #show' do
     context "ログイン済みのユーザーとして" do
       it 'responds successfully' do
-        sign_in_as user
-        get user_path(user)
+        sign_in_as @user
+        get user_path(@user)
         expect(response).to be_success
         expect(response).to have_http_status 200
       end
@@ -34,7 +40,7 @@ RSpec.describe 'access to users', type: :request do
 
     context "ログインしていないユーザーの場合" do
       it "ログイン画面にリダイレクトすること" do
-        get user_path(user)
+        get user_path(@user)
         expect(response).to redirect_to login_path
       end
     end
@@ -86,8 +92,8 @@ RSpec.describe 'access to users', type: :request do
   describe "GET #edit" do
     context "ログインユーザー済みのユーザーとして" do
       it "responds successfully" do
-        sign_in_as user
-        get edit_user_path(user)
+        sign_in_as @user
+        get edit_user_path(@user)
         expect(response).to be_success
         expect(response).to have_http_status 200
       end
@@ -95,7 +101,7 @@ RSpec.describe 'access to users', type: :request do
 
     context "ログインしていない場合" do
       it "ログイン画面にリダイレクト" do
-        get edit_user_path(user)
+        get edit_user_path(@user)
         expect(response).to have_http_status 302
         expect(response).to redirect_to login_path
       end
@@ -103,8 +109,8 @@ RSpec.describe 'access to users', type: :request do
 
     context "異なるユーザーの場合" do
       it "ホーム画面にリダイレクトすること" do
-        sign_in_as other_user
-        get edit_user_path(user)
+        sign_in_as @other_user
+        get edit_user_path(@user)
         expect(response).to redirect_to root_path
       end
     end
@@ -114,16 +120,16 @@ RSpec.describe 'access to users', type: :request do
     context "認可されたユーザーとして" do
       it "ユーザーを更新できること" do
         user_params = FactoryBot.attributes_for(:user, name: "TestName")
-        sign_in_as user
-        patch user_path(user), params: { id: user.id, user: user_params }
-        expect(user.reload.name).to eq "TestName"
+        sign_in_as @user
+        patch user_path(@user), params: { id: @user.id, user: user_params }
+        expect(@user.reload.name).to eq "TestName"
       end
     end
 
     context "ログインしていない場合" do
       it "ログイン画面にリダイレクト" do
-        user_params = FactoryBot.attributes_for(:user, name: 'testuser')
-        patch user_path(user), params: { id: user.id, user: user_params }
+        user_params = FactoryBot.attributes_for(:user, name: "TestName")
+        patch user_path(@user), params: { id: @user.id, user: user_params }
         expect(response).to have_http_status 302
         expect(response).to redirect_to login_path
       end
@@ -132,15 +138,15 @@ RSpec.describe 'access to users', type: :request do
     context "異なるユーザーの場合" do
       it "ユーザーを更新できないこと" do
         user_params = FactoryBot.attributes_for(:user, name: "testname")
-        sign_in_as other_user
-        patch user_path(user), params: { id: user.id, user: user_params }
-        expect(user.reload.name).to eq other_user.name
+        sign_in_as @other_user
+        patch user_path(@user), params: { id: @user.id, user: user_params }
+        expect(@user.reload.name).to eq @user.name
       end
 
       it "ホーム画面にリダイレクトすること" do
         user_params = FactoryBot.attributes_for(:user, name: "testname")
-        sign_in_as other_user
-        patch user_path(user), params: { id: user.id, user: user_params }
+        sign_in_as @other_user
+        patch user_path(@user), params: { id: @user.id, user: user_params }
         expect(response).to redirect_to root_path
       end
     end
@@ -149,29 +155,29 @@ RSpec.describe 'access to users', type: :request do
   describe "#destroy" do
     context "Adminユーザーとして" do
       it "ユーザーを削除できること" do
-        sign_in_as user
+        sign_in_as @admin_user
         expect {
-          delete user_path(user), params: { id: user.id }
+          delete user_path(@user), params: { id: @user.id }
         }.to change(User, :count).by(-1)
       end
     end
 
     context "Adminユーザーでない場合" do
       it "ホーム画面にリダイレクトすること" do
-        sign_in_as other_user
-        delete user_path(user), params: { id: user.id }
-        expect(response).to redirect_to users_path
+        sign_in_as @user
+        delete user_path(@user), params: { id: @user.id }
+        expect(response).to redirect_to root_path
       end
     end
 
     context "ログインせずに削除" do
       it "return a 302 response" do
-        delete user_path(user), params: { id: user.id }
+        delete user_path(@user), params: { id: @user.id }
         expect(response).to have_http_status 302
       end
 
       it "ログインページにリダイレクト" do
-        delete user_path(user), params: { id: user.id }
+        delete user_path(@user), params: { id: @user.id }
         expect(response).to redirect_to login_path
       end
     end
