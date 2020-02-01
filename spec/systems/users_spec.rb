@@ -11,14 +11,16 @@ RSpec.describe 'users', type: :system do
     @admin_user = create(:admin_user)
   end
 
-  describe "user show" do
+  describe "microposts" do
     before do
       valid_login(user_with_microposts)
       visit user_path(user_with_microposts)
     end
 
     it "Micropostが表示されていること" do
-      expect(page).to have_content("#{user_with_microposts.name}")
+      expect{
+        is_expected.to have_link("#{user_with_microposts.name}", href: user_with_microposts.user)
+      }
     end
   end
 
@@ -56,7 +58,7 @@ RSpec.describe 'users', type: :system do
       end
 
       it 'render to /signup url' do
-        is_expected.to have_current_path '/signup'
+        is_expected.to have_current_path '/users'
       end
     end
   end

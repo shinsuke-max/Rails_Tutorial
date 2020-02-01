@@ -1,9 +1,7 @@
 require 'rails_helper'
 
 RSpec.describe 'access to users', type: :request do
-  #let(:user) { FactoryBot.create(:user) }
-  #let(:other_user) { FactoryBot.create(:other_user) }
-  #let(:admin_user) { FactoryBot.create(:admin_user) }
+
   before(:each) do
     @user = create(:user)
     @other_user = create(:other_user)
