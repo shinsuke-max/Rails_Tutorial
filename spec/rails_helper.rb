@@ -35,6 +35,7 @@ end
 RSpec.configure do |config|
   config.include TestHelper
   config.include LoginSupport
+  config.include SupportModule
   # Remove this line if you're not using ActiveRecord or ActiveRecord fixtures
   config.fixture_path = "#{::Rails.root}/spec/fixtures"
 

@@ -1,5 +1,4 @@
 module LoginSupport
-
   def valid_login(user)
     visit root_path
     click_link "Log in"
@@ -7,5 +6,4 @@ module LoginSupport
     fill_in 'Password', with: user.password
     click_button 'Log in'
   end
-  
 end
