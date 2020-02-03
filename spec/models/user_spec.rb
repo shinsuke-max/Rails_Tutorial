@@ -63,4 +63,30 @@ RSpec.describe User, type: :model do
     end
   end
 
+  describe "パスワード認証" do
+    context "パスワードが一致しない" do
+      before { user.password_confirmation = "mismatch" }
+      it { is_expected.not_to be_valid }
+    end
+  end
+
+  describe "authenticateメソッド" do
+    before { user.save }
+    let(:found_user) { User.find_by(email: user.email) }
+    context "有効なパスワードの場合" do
+      it "認証に成功" do
+        should eq found_user.authenticate(user.password)
+      end
+      it { expect(found_user).to be_truthy }
+      it { expect(found_user).to be_valid }
+    end
+    context "無効なパスワードの場合" do
+      let(:incorrect) { found_user.authenticate("aaaaaa") }
+      it "認証に失敗" do
+        should_not eq incorrect
+      end
+      it { expect(incorrect).to be_falsey }
+    end
+  end
+
 end
