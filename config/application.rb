@@ -12,11 +12,7 @@ module RailsTutorial
     config.load_defaults 5.2
 
     config.generators do |g|
-      g.test_framework :rspec,
-                      view_specs: false,
-                      helper_specs: false,
-                      routing_specs: false,
-                      controller_specs: false
+      g.test_framework false
     end
     # Settings in config/environments/* take precedence over those specified here.
     # Application configuration can go into files in config/initializers
