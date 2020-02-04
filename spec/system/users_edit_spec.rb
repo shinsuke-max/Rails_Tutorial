@@ -1,6 +1,6 @@
 require 'rails_helper'
 
-RSpec.describe 'UsersEdit', type: :system do
+RSpec.describe 'UsersEdit', type: :feature do
   include_context "setup"
 
   subject { page }
@@ -39,12 +39,26 @@ RSpec.describe 'UsersEdit', type: :system do
       end
     end
 
-    #describe "adminの場合", type: :request do
-      #scenario "HTTP経由で変更できないこと" do
-        #patch user_path(user), params: { user: admin_params }
-        #expect(user.reload).not_to be_admin
-        #expect(page).to have_current_path("/")
-     # end
-    #end
+    describe "adminの場合", type: :request do
+      scenario "HTTP経由で変更できないこと" do
+        patch user_path(user), params: { user: admin_params }
+        expect(user.reload).not_to be_admin
+        expect(page).to have_current_path("/")
+      end
+    end
+
+    describe "friendly forwarding" do
+      context "after login (non-login-user)" do
+        scenario "render desired page" do
+          visit edit_user_path(user)
+          error_messages("Please log in")
+          should have_current_path("/login")
+          valid_login(user)
+          should have_current_path(edit_user_path(user))
+          should have_title("Edit user")
+          should have_css("h1", text: "Update your profile")
+        end
+      end
+    end
   end
 end

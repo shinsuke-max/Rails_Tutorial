@@ -89,4 +89,85 @@ RSpec.describe User, type: :model do
     end
   end
 
+  describe "マイクロポスト関連" do
+    before { user.save }
+
+    let(:new_post) { create(:user_post, :today, user: user) }
+    let(:old_post) { create(:user_post, :yesterday, user: user) }
+
+    it "降順に表示されること" do
+      new_post
+      old_post
+
+      expect(user.microposts.count).to eq 2
+      expect(Micropost.all.count).to eq user.microposts.count
+      expect(user.microposts.to_a).to eq [new_post, old_post]
+    end
+
+    it "ユーザーが削除されるとマイクロポストも削除される" do
+      new_post
+      old_post
+      my_posts = user.microposts.to_a
+      user.destroy
+
+      expect(my_posts).not_to be_empty
+      user.microposts.each do |post|
+        expect(Micropost.where(id: post.id)).to be_empty
+      end
+    end
+  end
+
+  describe "フォロー/フォロー解除" do
+    let(:following) { create_list(:other_user, 30) }
+
+    before do
+      user.save
+      following.each do |u|
+        user.follow(u)
+        u.follow(user)
+      end
+    end
+
+    describe "フォロー" do
+      it "following? method" do
+        following.each do |u|
+          expect(user.following?(u)).to be_truthy
+        end
+      end
+      it "other-user (follow method)" do
+        following.each do |u|
+          expect(user.following).to include(u)
+        end
+      end
+      it "user (follow method)" do
+        following.each do |u|
+          expect(u.followers).to include(user)
+        end
+      end
+    end
+
+    describe "フォロー解除" do
+      before do
+        following.each do |u|
+          user.unfollow(u)
+        end
+      end
+      it "following? method" do
+        following.each do |u|
+          expect(user.following?(u)).to be_falsey
+        end
+      end
+      it "other-user (follow method)" do
+        following.each do |u|
+          expect(user.reload.following).not_to include(u)
+        end
+      end
+      it "user (follow method)" do
+        following.each do |u|
+          expect(u.followers).not_to include(user)
+        end
+      end
+    end
+  end
+
 end
