@@ -12,6 +12,9 @@ module RailsTutorial
     config.load_defaults 5.2
 
     config.generators do |g|
+      g.stylesheets false
+      g.javascripts false
+      g.helper false
       g.test_framework false
     end
     # Settings in config/environments/* take precedence over those specified here.
