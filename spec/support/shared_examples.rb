@@ -1,3 +1,15 @@
+shared_examples_for "success message" do |msg|
+  it { subject.call; expect(flash[:success]).to eq msg }
+end
+
+shared_examples_for "error message" do |msg|
+  it { subject.call; expect(flash[:danger]).to eq msg }
+end
+
+shared_examples_for "redirect to path" do |path|
+  it { subject.call; expect(response).to redirect_to path }
+end
+
 shared_examples_for "signup-form have right css" do
   it { expect(page).to have_css('label', text: 'Name') }
   it { expect(page).to have_css('label', text: 'Email') }

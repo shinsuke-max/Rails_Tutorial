@@ -89,4 +89,124 @@ RSpec.describe User, type: :model do
     end
   end
 
+  describe "マイクロポスト関連" do
+    before { user.save }
+
+    let(:new_post) { create(:user_post, :today, user: user) }
+    let(:old_post) { create(:user_post, :yesterday, user: user) }
+
+    it "降順に表示されること" do
+      new_post
+      old_post
+
+      expect(user.microposts.count).to eq 2
+      expect(Micropost.all.count).to eq user.microposts.count
+      expect(user.microposts.to_a).to eq [new_post, old_post]
+    end
+
+    it "ユーザーが削除されるとマイクロポストも削除される" do
+      new_post
+      old_post
+      my_posts = user.microposts.to_a
+      user.destroy
+
+      expect(my_posts).not_to be_empty
+      user.microposts.each do |post|
+        expect(Micropost.where(id: post.id)).to be_empty
+      end
+    end
+
+    describe "マイクロポストフィード" do
+      let(:following) { create_list(:other_user, 30) }
+      let(:not_following) { create(:other_user) }
+
+      before do
+        create_list(:user_post, 10, user: user)
+        create_list(:other_user_post, 10, user: not_following)
+        following.each do |u|
+          user.follow(u)
+          u.follow(user)
+          create_list(:other_user_post, 3, user: u)
+        end
+      end
+
+      it { expect(user.microposts.count).to eq 10 }
+      it { expect(not_following.microposts.count).to eq 10 }
+      it { expect(Micropost.all.count).to eq 110 }
+
+      describe "have right microposts" do
+        it "followings-user's micropost" do
+          following.each do |u|
+            u.microposts.each do |post|
+              expect(user.feed).to include(post)
+            end
+          end
+        end
+        it "my own micropost" do
+          user.microposts.each do |post|
+            expect(user.feed).to include(post)
+          end
+        end
+        it "フォローしていないユーザーの投稿は表示されないこと" do
+          not_following.microposts.each do |post|
+            expect(user.feed).not_to include(post)
+          end
+        end
+      end
+    end
+  end
+
+  describe "フォロー/フォロー解除" do
+    let(:following) { create_list(:other_user, 30) }
+
+    before do
+      user.save
+      following.each do |u|
+        user.follow(u)
+        u.follow(user)
+      end
+    end
+
+    describe "フォロー" do
+      it "following? method" do
+        following.each do |u|
+          expect(user.following?(u)).to be_truthy
+        end
+      end
+      it "other-user (follow method)" do
+        following.each do |u|
+          expect(user.following).to include(u)
+        end
+      end
+      it "user (follow method)" do
+        following.each do |u|
+          expect(u.followers).to include(user)
+        end
+      end
+    end
+
+    describe "フォロー解除" do
+      before do
+        following.each do |u|
+          user.unfollow(u)
+        end
+      end
+      it "following? method" do
+        following.each do |u|
+          expect(user.following?(u)).to be_falsey
+        end
+      end
+      it "other-user (follow method)" do
+        following.each do |u|
+          expect(user.reload.following).not_to include(u)
+        end
+      end
+      it "user (follow method)" do
+        following.each do |u|
+          expect(u.followers).not_to include(user)
+        end
+      end
+    end
+  end
+
 end
