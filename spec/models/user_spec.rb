@@ -115,6 +115,45 @@ RSpec.describe User, type: :model do
         expect(Micropost.where(id: post.id)).to be_empty
       end
     end
+
+    describe "マイクロポストフィード" do
+      let(:following) { create_list(:other_user, 30) }
+      let(:not_following) { create(:other_user) }
+
+      before do
+        create_list(:user_post, 10, user: user)
+        create_list(:other_user_post, 10, user: not_following)
+        following.each do |u|
+          user.follow(u)
+          u.follow(user)
+          create_list(:other_user_post, 3, user: u)
+        end
+      end
+
+      it { expect(user.microposts.count).to eq 10 }
+      it { expect(not_following.microposts.count).to eq 10 }
+      it { expect(Micropost.all.count).to eq 110 }
+
+      describe "have right microposts" do
+        it "followings-user's micropost" do
+          following.each do |u|
+            u.microposts.each do |post|
+              expect(user.feed).to include(post)
+            end
+          end
+        end
+        it "my own micropost" do
+          user.microposts.each do |post|
+            expect(user.feed).to include(post)
+          end
+        end
+        it "フォローしていないユーザーの投稿は表示されないこと" do
+          not_following.microposts.each do |post|
+            expect(user.feed).not_to include(post)
+          end
+        end
+      end
+    end
   end
 
   describe "フォロー/フォロー解除" do
