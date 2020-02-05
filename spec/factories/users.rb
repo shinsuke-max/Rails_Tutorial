@@ -8,7 +8,7 @@ FactoryBot.define do
     admin { false }
 
     factory :other_user do
-      name { Faker::Name.name }
+      name { "other_user" }
       email { Faker::Internet.email }
     end
 

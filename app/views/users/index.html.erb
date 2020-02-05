@@ -1,10 +1,34 @@
-<% provide(:title, 'All users') %>
-<h1>All users</h1>
+<% provide(:title, @title) %>
+<h1><%= @title %></h1>
+
+<div class="row">
+  <div class="search_form">
+    <%= render 'users/search_form' %>
+  </div>
+</div>
 
 <%= will_paginate %>
 
-<ul class="users">
-  <%= render @users %>
-</ul>
+<% unless @q_users.empty? %>
+  <ul class="users">
+    <%= render @q_users %>
+  </ul>
+<% else %>
+  <p>
+    検索結果は0です。
+    <ul class="users">
+      <%= @users.all.each do |user| %>
+      <li>
+        <%= gravatar_for user, size: 50 %>
+        <%= link_to user.name, user %>
+        <% if current_user.admin? && !current_user?(user) %>
+          | <%= link_to "delete", user, method: :delete,
+                                        data: { confirm: "You sure?" } %>
+        <% end %>
+        </li>
+      <% end %>
+    </ul>
+  </p>
+<% end %>
 
 <%= will_paginate %>
