@@ -3,12 +3,6 @@ require 'rails_helper'
 RSpec.describe 'access to users', type: :request do
   include_context "setup"
 
-  #before(:each) do
-    #@user = create(:user)
-    #@other_user = create(:other_user)
-    #@admin_user = create(:admin_user)
-  #end
-
   describe "GET #index" do
     context "ログイン済みのユーザーとして" do
       it "正しく表示されているか" do
@@ -156,7 +150,7 @@ RSpec.describe 'access to users', type: :request do
       #it "ユーザーを削除できること" do
         #sign_in_as admin
         #expect {
-          #delete user_path(user), params: { id: user.id }
+          #delete user_path(user), params: { id: user.id } 
         #}.to change(User, :count).by(-1)
       #end
     #end
