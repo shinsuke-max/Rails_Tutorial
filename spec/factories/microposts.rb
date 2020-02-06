@@ -1,6 +1,6 @@
 FactoryBot.define do
   factory :user_post, class: Micropost do
-    content { Faker::Lorem.sentence(5) }
+    content { "TestContent" }
     association :user, factory: :user
 
     trait :today do
